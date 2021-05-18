@@ -8,7 +8,8 @@ from datetime import datetime
 
 #Conecatar com o banco BD_ACAOFGTS
 try:
-    conn = msql.connect(host='localhost', user='chico',password='chic@oSQL2020', database ='bd_acaofgts',charset='utf8')
+    conn = msql.connect(host='localhost', user='chico',password='chic@oSQL2020', database ='bd_acaofgts',
+                              auth_plugin='mysql_native_password',charset='utf8')
     cursor = conn.cursor()
     if conn.is_connected():        
         print("database is created")
@@ -16,7 +17,8 @@ except Error as e:
     print("Error while connecting to MySQL", e)
 
 # Abre arquivo csc com os dados do trabalharo para atualização
-file = "C:\\Users\\fasso\OneDrive\\Documents\\temp\\FGTS Francisco\\indicesinpc.csv"
+#file = "C:\\Users\\fasso\OneDrive\\Documents\\temp\\FGTS Francisco\\indicesinpc.csv"
+file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS Francisco\\indicesinpc.csv"
 openFile = open(file,'r')
 lin=0
 
@@ -48,6 +50,7 @@ def menu ():
     print ('   5 - vincular trabalhador e sua conta a Empresa') 
     print ('   6 - listar vinculo Trabalhador X Empresa X conta') 
     print ('   7 - Buscar CSV e atualizar dados(Gravar atualização)') 
+    print ('   8 - Data Sys') 
     print ('   9 - Sair') 
     opt = input('Digite a opçao desejada: ') 
     return opt 
@@ -59,21 +62,23 @@ def adicionar_trabalhador ():
         print('trabalhador já Cadastrado !')
     else:
         CPFtrabalhador = str(input("CPF:"))
+        carttrabalho = str(input("Num. Carteira Trabalho:"))
+        pisPASEP = str(input("Pis/PASEP:"))
         il_CPFtrabalhador=CPFtrabalhador
         emailtrabalhador = str(input("E-mail:"))
         il_emailtrabalhador=emailtrabalhador
         senhatrabalhador = str(input("Senha:")) 
         il_senhatrabalhador = senhatrabalhador
-        il_datacadastro = datetime.now()
+        il_datacadastro = ver_date()
         list_trabalhador.append(il_trabalhador)
         list_trabalhador.append(il_CPFtrabalhador)
         list_trabalhador.append(il_emailtrabalhador)
         list_trabalhador.append(il_senhatrabalhador)
         list_trabalhador.append(il_datacadastro)
-        strSql='insert pessoas (Nome,cpf,email,senha) VALUES (%s,%s,%s,%s)'
-        print(strSql)
-        listar_trabalhador ()
-        cursor.execute(strSql,(il_trabalhador,il_CPFtrabalhador,il_emailtrabalhador,il_senhatrabalhador))
+        strSql='insert pessoas (Nome,cpf,CarteiraTrabalho,PISPASEP,email,senha,DataCadastro) VALUES (%s,%s,%s,%s,%s,%s,%s)'
+        #print(strSql)
+        listar_trabalhador (1)
+        cursor.execute(strSql,(il_trabalhador,il_CPFtrabalhador,carttrabalho,pisPASEP,il_emailtrabalhador,il_senhatrabalhador,il_datacadastro))
         conn.commit()
         print('Trabalhador ',il_trabalhador, ' cadastrado!') 
     pass 
@@ -84,10 +89,11 @@ def adicionar_Empresa():
     if il_empresa in list_empresa:
         print('Empresa já Cadastrado !')
     else:
-        empresaCodigo = str(input("Codigo:"))
+        CodigoEmpresa = str(input("Codigo:"))
         cnpjEmresa= str(input("CNPJ:"))
-        strSql='insert Empresas (Empresa,Codigo,cnpj) values (%s,%s,%s)'
-        cursor.execute(strSql,(empresa,empresaCodigo,cnpjEmresa))
+        inscricao = str(input('Inscricao FGTS:'))
+        strSql='insert Empresas (Empresa,CodigoEmpresa,cnpj,inscricao) values (%s,%s,%s,%s)'
+        cursor.execute(strSql,(empresa,CodigoEmpresa,cnpjEmresa,inscricao))
         conn.commit()
         print('Trabalhador ',empresa, ' cadastrado!') 
     pass 
@@ -162,10 +168,10 @@ def listar_trabalhador (_par):
 def listar_Empresa(_par):
     
     if (int)(_par=='1'):
-        strSql= 'Select id,Empresa,codigo,cnpj from Empresas'
+        strSql= 'Select Id,Empresa,CodigoEmpresa,CNPJ,inscricao from Empresas'
     else:
         print(_par,'estou aqui!')
-        strSql= 'Select Id, Empresa, Codigo, CNPJ from Empresas where cnpj = %s'
+        strSql= 'Select Id,Empresa,CodigoEmpresa,CNPJ,inscricao from Empresas where cnpj = %s'
     
     cursor.execute(strSql,_par)
 
@@ -178,7 +184,8 @@ def listar_Empresa(_par):
         print("Id:", linha[0])        
         print("CNPJ:", linha[3])
         print("Nome:", linha[1])
-        print("Código:", linha[2])
+        print("Código Empresa:", linha[2])
+        print("Inscricao:", linha[4])
         print('----------------------------------------------------------------------------------------',"\n")
     pass
 
@@ -194,7 +201,7 @@ def ver_date():
     strdata=today.strftime("%d/%m/%Y")
     strdata=strdata.strip()
     #strdata='STR_TO_DATE(',strdata,'"%d/%m/%Y")'
-  
+    return strdata
     print(today)
     print('n/')
     print ('STR_TO_DATE("',strdata,'","%d/%m/%Y")')
@@ -221,6 +228,10 @@ while opcao != '9':
         listar_Empresa(paramentro)
     elif opcao == '5':
         adicionar_TrabalhadorEmpresa()
+    elif opcao == '8':
+        datasis = ver_date()
+        print(datasis)
+
     opcao = menu() 
 
 
