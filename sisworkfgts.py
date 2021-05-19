@@ -1,4 +1,5 @@
 #coding= latin-1 
+import csv
 import string
 import mysql.connector as msql
 from mysql.connector import Error
@@ -17,8 +18,8 @@ except Error as e:
     print("Error while connecting to MySQL", e)
 
 # Abre arquivo csc com os dados do trabalharo para atualização
-#file = "C:\\Users\\fasso\OneDrive\\Documents\\temp\\FGTS Francisco\\indicesinpc.csv"
-file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS Francisco\\indicesinpc.csv"
+file = "C:\\Users\\fasso\OneDrive\\Documents\\temp\\FGTS Francisco\\indicesinpc.csv"
+#file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS Francisco\\indicesinpc.csv"
 openFile = open(file,'r')
 lin=0
 
@@ -51,7 +52,7 @@ def menu ():
     print ('   6 - listar vinculo Trabalhador X Empresa X conta') 
     print ('   7 - Buscar CSV e atualizar dados(Gravar atualização)') 
     print ('   8 - Data Sys') 
-    print ('   9 - Sair') 
+    print ('   15 - Sair') 
     opt = input('Digite a opçao desejada: ') 
     return opt 
   
@@ -134,15 +135,13 @@ def adicionar_TrabalhadorEmpresa ():
             print(linha[2],"\n")
     else:
         print('Empresa não cadastrado')
-    ContaFGTS = input("Numero Conta FGTS:")
-    CarteiraTrabalho = input("Numero Conta Carteira Trabalho:")
-    Inscricao = input("Numero Inscrição FGTS:")
-    NumeroConta = input("Numero Conta FGTS:")
-    DataOpcao = input("Data cadastro da conta FGTS:")
-    Categoria = input("Categoria FGTS:")
-    TipoConta = input("Tipo Conta FGTS:")
-    strSql='insert trabalhadordadosfgts (ContaFGTS,CarteiraTrabalho,Inscricao,NumeroConta,DataOpcao,Categoria,TipoConta,Empresa_Id,Pessoas_ID) values (%s,%s,%s,%s,%s,%s,%s,%s,%s)'
-    cursor.execute(strSql,(ContaFGTS,CarteiraTrabalho,Inscricao,NumeroConta,DataOpcao,Categoria,TipoConta,id_Empresa,id_trabalhador))
+    
+    contaFGTS = input("Numero Conta FGTS:")
+    dataOpcao = input("Data Opção:")
+    categoria = input("Categoria FGTS:")
+    tipoConta = input("Tipo Conta:")
+    strSql='insert trabalhadordadosfgts (NumeroContaFGTS,DataOpcao,Categoria,TipoConta,Empresas_Id,Pessoas_ID) values (%s,%s,%s,%s,%s,%s)'
+    cursor.execute(strSql,(contaFGTS,dataOpcao,categoria,tipoConta,id_Empresa,id_trabalhador))
     conn.commit()
     pass 
 
@@ -189,6 +188,76 @@ def listar_Empresa(_par):
         print('----------------------------------------------------------------------------------------',"\n")
     pass
 
+def listar_Vinculo_Trabalhador_FGTS():
+    cpf=str(input("Digite o CPF do trabalhador:"))
+    strSql= "SELECT T3.ID,T3.NumeroContaFGTS,T1.ID,T1.CPF,T1.Nome,T2.ID,T2.CNPJ,T2.Empresa \
+            from (trabalhadordadosfgts as T3 inner join pessoas as T1 on T3.Pessoas_ID=T1.ID) inner join Empresas T2 on T3.empresas_Id = T2.ID \
+            where CPF ='%s'" % cpf
+    cursor.execute(strSql)
+    linhas = cursor.fetchall()
+    if cursor.rowcount>0:
+        for linha in linhas:
+            id_trabalhador = linha[2]
+            id_Empresa = linha[5]
+            id_trabalhadorfgts = linha[0]
+            print("\n",id_trabalhador)
+            print(linha[4])
+            print(linha[7],"\n")
+    else:
+        print('Trabalhador não cadastrado') 
+    file = "C:\\Users\\fasso\OneDrive\\Documents\\temp\\FGTS Francisco\\creditojan.csv"
+    openFile = open(file,'r')
+    lin=0
+    totalCorrigido =0
+    valorCreditado=0
+    with openFile as arq:
+        linhas = csv.DictReader(arq,delimiter = ';',fieldnames=['Data','Lancamentos','Valor','Total'])
+        linhas.__next__()
+        for linha in linhas: 
+            lin+=1
+            vetDate=linha['Data'].strip().split("/")
+            mes=int(vetDate[1].strip())
+            ano=int(vetDate[2].strip())
+            valorCreditado = float(linha['Valor'].replace(',', '.').strip()) 
+            if ano>=1999:
+                print(vetDate)
+                print(mes)
+                print(ano)
+                print(valorCreditado)
+                strSql="SELECT Id,Mes,Ano,IndiceJAM3,indiceINPC,Juros3,NovoIndice FROM indiceinpc where mes= %s and ano = %s"
+                cursor.execute(strSql,(mes,ano))
+                result = cursor.fetchall()
+                for i in result:
+                    print(i[0])
+                    print(i[1])
+                    print(i[2])
+                    indiceJAM3 = i[3]
+                    print(indiceJAM3)
+                    print(i[4])
+                    print(i[5])
+                    novoIndice = i[6]
+                    print(novoIndice)                
+                    #----------------------------------------------------------------------------------------------------------------------
+                    creditoJan = valorCreditado/indiceJAM3 
+                    #creditoJan = "%.2f" % creditoJan
+                    print('Credito do mes FGTDS ',  creditoJan )
+                    newCredito = creditoJan * novoIndice
+                    #newCredito = "%.2f" %newCredito
+                    print('Novo Valor do Credito do mes FGTDS ',  newCredito )
+                    diferencaCredito = newCredito - valorCreditado 
+                    #diferencaCredito = "%.2f" %diferencaCredito  
+                    print('Novo Valor do Credito do mes FGTDS ',  diferencaCredito )
+                    novaCorrecao = totalCorrigido * novoIndice
+                    #novaCorrecao = "%.2f" %novaCorrecao
+                    print('Correção INPC + 3 % aa', novaCorrecao)
+                    totalCorrigido = totalCorrigido + diferencaCredito + novaCorrecao
+                    totalCorrigido = "%.2f" %totalCorrigido
+                    print('Valor Corrigido',totalCorrigido)
+    print(lin)
+    conn.close()
+    pass
+
+
 def verificar_situacao ():
     trabalhador = str(input("Digite o nome do trabalhador: "))
     pass 
@@ -211,7 +280,7 @@ print('/n')
 
 le_trabalhador() 
 opcao = menu() 
-while opcao != '9': 
+while opcao != '15': 
     if opcao == '1': 
         adicionar_trabalhador()
     elif opcao == '2':  
@@ -228,6 +297,8 @@ while opcao != '9':
         listar_Empresa(paramentro)
     elif opcao == '5':
         adicionar_TrabalhadorEmpresa()
+    elif opcao == '6':
+        listar_Vinculo_Trabalhador_FGTS()
     elif opcao == '8':
         datasis = ver_date()
         print(datasis)
