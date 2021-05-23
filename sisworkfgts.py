@@ -18,8 +18,8 @@ except Error as e:
     print("Error while connecting to MySQL", e)
 
 # Abre arquivo csc com os dados do trabalharo para atualização
-file = "C:\\Users\\fasso\OneDrive\\Documents\\temp\\FGTS Francisco\\indicesinpc.csv"
-#file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS Francisco\\indicesinpc.csv"
+#file = "C:\\Users\\fasso\OneDrive\\Documents\\temp\\FGTS Francisco\\indicesinpc.csv"
+file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS Francisco\\indicesinpc.csv"
 openFile = open(file,'r')
 lin=0
 
@@ -30,7 +30,6 @@ il_CPFtrabalhador=[]
 il_emailtrabalhador=[]
 il_senhatrabalhador=[]
 il_datacadastro=[]
-#list_trabalhador=[il_trabalhador,il_CPFtrabalhador,il_emailtrabalhador,il_senhatrabalhador,il_datacadastro] 
 list_trabalhador=[il_trabalhador,il_CPFtrabalhador,il_emailtrabalhador,il_senhatrabalhador] 
 list_empresa=[]
 empresa=''
@@ -49,8 +48,8 @@ def menu ():
     print ('   3 - cadastrar Empresa') 
     print ('   4 - listar Empresa') 
     print ('   5 - vincular trabalhador e sua conta a Empresa') 
-    print ('   6 - listar vinculo Trabalhador X Empresa X conta') 
-    print ('   7 - Buscar CSV e atualizar dados(Gravar atualização)') 
+    print ('   6 - Buscar CSV e atualizar dados(Gravar atualização)') 
+    print ('   7 - listar vinculo Trabalhador X Empresa X conta') 
     print ('   8 - Data Sys') 
     print ('   15 - Sair') 
     opt = input('Digite a opçao desejada: ') 
@@ -200,15 +199,19 @@ def listar_Vinculo_Trabalhador_FGTS():
             id_trabalhador = linha[2]
             id_Empresa = linha[5]
             id_trabalhadorfgts = linha[0]
-            print("\n",id_trabalhador)
+            print('\n******************************---------------------------------**********************************')
+            print(id_trabalhadorfgts, 'indice da tabela vinculo trabalhador')
+            print(id_trabalhador)
             print(linha[4])
             print(linha[7],"\n")
     else:
         print('Trabalhador não cadastrado') 
-    file = "C:\\Users\\fasso\OneDrive\\Documents\\temp\\FGTS Francisco\\creditojan.csv"
+    file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS Francisco\\creditojan.csv"
+    #file = "C:\\Users\\fasso\OneDrive\\Documents\\temp\\FGTS Francisco\\creditojan.csv"
+    file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS erick\\creditojan.csv"
     openFile = open(file,'r')
     lin=0
-    totalCorrigido =0
+    totalCorrigido=0
     valorCreditado=0
     with openFile as arq:
         linhas = csv.DictReader(arq,delimiter = ';',fieldnames=['Data','Lancamentos','Valor','Total'])
@@ -220,6 +223,7 @@ def listar_Vinculo_Trabalhador_FGTS():
             ano=int(vetDate[2].strip())
             valorCreditado = float(linha['Valor'].replace(',', '.').strip()) 
             if ano>=1999:
+                print(id_trabalhadorfgts, 'indice da tabela vinculo trabalhador')
                 print(vetDate)
                 print(mes)
                 print(ano)
@@ -228,31 +232,45 @@ def listar_Vinculo_Trabalhador_FGTS():
                 cursor.execute(strSql,(mes,ano))
                 result = cursor.fetchall()
                 for i in result:
-                    print(i[0])
+                    Id_indiceINPC = i[0]
+                    totalCorrigido = totalCorrigido                        
+                    print(Id_indiceINPC)
                     print(i[1])
                     print(i[2])
+                    #indiceJAM3 = "%.2f" % i[3]
                     indiceJAM3 = i[3]
                     print(indiceJAM3)
                     print(i[4])
                     print(i[5])
                     novoIndice = i[6]
-                    print(novoIndice)                
+                    print(novoIndice)  
+                    #creditoJan = decimal(2.10) creditoJan              
                     #----------------------------------------------------------------------------------------------------------------------
                     creditoJan = valorCreditado/indiceJAM3 
-                    #creditoJan = "%.2f" % creditoJan
+                    #
                     print('Credito do mes FGTDS ',  creditoJan )
                     newCredito = creditoJan * novoIndice
                     #newCredito = "%.2f" %newCredito
                     print('Novo Valor do Credito do mes FGTDS ',  newCredito )
                     diferencaCredito = newCredito - valorCreditado 
                     #diferencaCredito = "%.2f" %diferencaCredito  
-                    print('Novo Valor do Credito do mes FGTDS ',  diferencaCredito )
+                    print('Novo Valor da diferenca Credito do mes FGTDS ',  diferencaCredito )
                     novaCorrecao = totalCorrigido * novoIndice
                     #novaCorrecao = "%.2f" %novaCorrecao
                     print('Correção INPC + 3 % aa', novaCorrecao)
                     totalCorrigido = totalCorrigido + diferencaCredito + novaCorrecao
-                    totalCorrigido = "%.2f" %totalCorrigido
+                    ValortotalCorrigido = "%.2f" %totalCorrigido
                     print('Valor Corrigido',totalCorrigido)
+                    strSql='INSERT INTO fgtsatualizarpessoa (Mes,Ano,ValorJAM,ValorCreditado,NovoCredito,DiferencaCredito,Correcao,TotalCorrigido,indiceinpc_Id, \
+                            trabalhadordadosfgts_ID,trabalhadordadosfgts_Pessoas_ID,trabalhadordadosfgts_empresas_Id) \
+                            VALUES( %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'
+                    
+                    print(id_trabalhadorfgts, 'indice da tabela vinculo trabalhador II')
+                    cursor.execute(strSql,(mes,ano,indiceJAM3,"%.2f" %valorCreditado,newCredito,"%.2f" %diferencaCredito,"%.2f" %novaCorrecao,ValortotalCorrigido,Id_indiceINPC,id_trabalhadorfgts,id_trabalhador,id_Empresa))
+                    conn.commit()
+                    print('\n******************************---------------------------------**********************************')
+
+
     print(lin)
     conn.close()
     pass
