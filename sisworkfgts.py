@@ -122,7 +122,7 @@ def adicionar_TrabalhadorEmpresa ():
     else:
         print('Trabalhador não cadastrado')
 
-    cnpj=str(input("Digite o Cnpj do trabalhador:"))
+    cnpj=str(input("Digite o Cnpj da Empresa:"))
     strSql= "SELECT ID,cnpj,Empresa FROM Empresas where CNPJ ='%s'" % cnpj
     cursor.execute(strSql)
     linhas = cursor.fetchall()
@@ -168,7 +168,7 @@ def listar_Empresa(_par):
     if (int)(_par=='1'):
         strSql= 'Select Id,Empresa,CodigoEmpresa,CNPJ,inscricao from Empresas'
     else:
-        print(_par,'estou aqui!')
+        
         strSql= 'Select Id,Empresa,CodigoEmpresa,CNPJ,inscricao from Empresas where cnpj = %s'
     
     cursor.execute(strSql,_par)
@@ -188,10 +188,10 @@ def listar_Empresa(_par):
     pass
 
 def listar_Vinculo_Trabalhador_FGTS():
-    cpf=str(input("Digite o CPF do trabalhador:"))
+    NumeroContaFGTS=str(input("Digite o numero da conta do FGTS do trabalhador:"))
     strSql= "SELECT T3.ID,T3.NumeroContaFGTS,T1.ID,T1.CPF,T1.Nome,T2.ID,T2.CNPJ,T2.Empresa \
             from (trabalhadordadosfgts as T3 inner join pessoas as T1 on T3.Pessoas_ID=T1.ID) inner join Empresas T2 on T3.empresas_Id = T2.ID \
-            where CPF ='%s'" % cpf
+            where NumeroContaFGTS ='%s'" % NumeroContaFGTS
     cursor.execute(strSql)
     linhas = cursor.fetchall()
     if cursor.rowcount>0:
@@ -206,9 +206,12 @@ def listar_Vinculo_Trabalhador_FGTS():
             print(linha[7],"\n")
     else:
         print('Trabalhador não cadastrado') 
-    file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS Francisco\\creditojan.csv"
+    #file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS Francisco\\creditojan.csv"
     #file = "C:\\Users\\fasso\OneDrive\\Documents\\temp\\FGTS Francisco\\creditojan.csv"
-    file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS erick\\creditojan.csv"
+    #file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS erick\\creditojan.csv"
+    #file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS marcelo\\creditojan 4674.csv"
+    #file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS marcelo\\creditojan 7529.csv"
+    file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS marcelo\\creditojan 30423.csv"
     openFile = open(file,'r')
     lin=0
     totalCorrigido=0
