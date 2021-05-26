@@ -188,10 +188,17 @@ def listar_Empresa(_par):
     pass
 
 def listar_Vinculo_Trabalhador_FGTS():
+<<<<<<< HEAD
     NumeroContaFGTS=str(input("Digite o numero da conta do FGTS do trabalhador:"))
     strSql= "SELECT T3.ID,T3.NumeroContaFGTS,T1.ID,T1.CPF,T1.Nome,T2.ID,T2.CNPJ,T2.Empresa \
             from (trabalhadordadosfgts as T3 inner join pessoas as T1 on T3.Pessoas_ID=T1.ID) inner join Empresas T2 on T3.empresas_Id = T2.ID \
             where NumeroContaFGTS ='%s'" % NumeroContaFGTS
+=======
+    cpf=str(input("Digite o CPF do trabalhador:"))
+    strSql= "SELECT T3.ID,T3.NumeroContaFGTS,T1.ID,T1.CPF,T1.Nome,T2.ID,T2.CNPJ,T2.Empresa \
+            from (trabalhadordadosfgts as T3 inner join pessoas as T1 on T3.Pessoas_ID=T1.ID) inner join Empresas T2 on T3.empresas_Id = T2.ID \
+            where CPF ='%s'" % cpf
+>>>>>>> 58261d463de8a7d5f0cfd14ef12c47b6d88f50b7
     cursor.execute(strSql)
     linhas = cursor.fetchall()
     if cursor.rowcount>0:
@@ -206,6 +213,7 @@ def listar_Vinculo_Trabalhador_FGTS():
             print(linha[7],"\n")
     else:
         print('Trabalhador não cadastrado') 
+<<<<<<< HEAD
     #file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS Francisco\\creditojan.csv"
     #file = "C:\\Users\\fasso\OneDrive\\Documents\\temp\\FGTS Francisco\\creditojan.csv"
     #file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS erick\\creditojan.csv"
@@ -219,6 +227,11 @@ def listar_Vinculo_Trabalhador_FGTS():
     #file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS marllus\\creditojan58960.csv"
     #file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS bruna\\creditojan60433.csv"
     file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS bruna\\creditojan4890.csv"    
+=======
+    file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS Francisco\\creditojan.csv"
+    #file = "C:\\Users\\fasso\OneDrive\\Documents\\temp\\FGTS Francisco\\creditojan.csv"
+    file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS erick\\creditojan.csv"
+>>>>>>> 58261d463de8a7d5f0cfd14ef12c47b6d88f50b7
     openFile = open(file,'r')
     lin=0
     totalCorrigido=0
