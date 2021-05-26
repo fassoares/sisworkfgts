@@ -211,7 +211,14 @@ def listar_Vinculo_Trabalhador_FGTS():
     #file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS erick\\creditojan.csv"
     #file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS marcelo\\creditojan 4674.csv"
     #file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS marcelo\\creditojan 7529.csv"
-    file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS marcelo\\creditojan 30423.csv"
+    #file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS marcelo\\creditojan 30423.csv"
+    #file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS marcelo\\creditojan 149038.csv"
+    #file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS marcelo\\creditojan13766.csv"
+    #file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS marcelo\\creditojan17753.csv"
+    #file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS marllus\\creditojan43776.csv"
+    #file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS marllus\\creditojan58960.csv"
+    #file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS bruna\\creditojan60433.csv"
+    file = "C:\\Users\\chico\OneDrive\\Documents\\temp\\FGTS bruna\\creditojan4890.csv"    
     openFile = open(file,'r')
     lin=0
     totalCorrigido=0
